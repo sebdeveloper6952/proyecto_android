@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">UVG_Share</string>
+    <string name="msg_welcome">Bienvenido</string>
+    <string name="msg_sign_in">Iniciar sesión</string>
+    <string name="msg_create_new_user">Registrarse</string>
+    <string name="msg_create_new_user_successful">Usuario creado exitosamente.</string>
+    <string name="msg_create_new_user_failed">Error al crear usuario.</string>
+    <string name="msg_logout">Cerrar sesión</string>
+    <string name="msg_sign_in_successful">Autenticación exitosa.</string>
+    <string name="msg_sign_in_failed">Error en autenticación.</string>
+    <string name="msg_logout_successful">Logout exitoso.</string>
+    <string name="msg_img_upload_successful">Imagen subida exitósamente.</string>
+    <string name="msg_img_upload_failed">Error al subir imagen.</string>
+</resources>
