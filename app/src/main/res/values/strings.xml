@@ -11,4 +11,6 @@
     <string name="msg_logout_successful">Logout exitoso.</string>
     <string name="msg_img_upload_successful">Imagen subida exitósamente.</string>
     <string name="msg_img_upload_failed">Error al subir imagen.</string>
+    <string name="msg_img_selected_success">Imagen seleccionada</string>
+    <string name="msg_img_selected_failed">No hay imagen seleccionada</string>
 </resources>

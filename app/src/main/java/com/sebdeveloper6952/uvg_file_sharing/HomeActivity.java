@@ -61,7 +61,7 @@ public class HomeActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent resultData)
     {
         // revisar requestCode y resultCode para determinar a que actividad se responde
-        if (requestCode == RC_WRITE_IMG_CODE)
+        if (requestCode == RC_CHOOSE_IMG)
         {
             if(resultCode == Activity.RESULT_OK)
             {
@@ -69,16 +69,20 @@ public class HomeActivity extends AppCompatActivity
                 {
                     selImgUri = resultData.getData();
                     // TODO: (mejorar) mostrar al usuario el archivo que subira
-                    txtViewInfo.setText(getFileName(selImgUri));
-                    Toast.makeText(getApplicationContext(), R.string.msg_img_upload_failed,
+                    txtViewInfo.setText(getFileName(selImgUri) + "\n");
+                    Toast.makeText(getApplicationContext(), R.string.msg_img_selected_success,
                             Toast.LENGTH_SHORT).show();
+                    // activar boton para subir imagen
+                    btnUpload.setEnabled(true);
                 }
             }
             else
             {
                 // TODO: (mostrar algun feedback) error en operacion de subir imagen
-                Toast.makeText(getApplicationContext(), R.string.msg_img_upload_failed,
+                Toast.makeText(getApplicationContext(), R.string.msg_img_selected_failed,
                         Toast.LENGTH_SHORT).show();
+                selImgUri = null;
+                btnUpload.setEnabled(false);
             }
         }
     }
@@ -99,7 +103,13 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
                     {
-                        txtViewInfo.append("Success\n");
+                        Toast.makeText(getApplicationContext(), R.string.msg_img_upload_successful,
+                                Toast.LENGTH_SHORT).show();
+                        // resetear imagen seleccionada
+                        // TODO: ver si se mete en metodo
+                        selImgUri = null;
+                        btnChooseImg.setEnabled(true);
+                        btnUpload.setEnabled(false);
                     }
                 });
                 task.addOnFailureListener(new OnFailureListener()
@@ -107,7 +117,10 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public void onFailure(@NonNull Exception e)
                     {
-                        txtViewInfo.append("Failure\n");
+                        Toast.makeText(getApplicationContext(), R.string.msg_img_upload_failed,
+                                Toast.LENGTH_SHORT).show();
+                        btnChooseImg.setEnabled(true);
+                        btnUpload.setEnabled(true);
                     }
                 });
                 task.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>()
@@ -177,11 +190,15 @@ public class HomeActivity extends AppCompatActivity
      */
     protected void prepareViews()
     {
+        // boton para subir imagen comienza desactivado
+        btnUpload.setEnabled(false);
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 uploadImage();
+                btnChooseImg.setEnabled(false);
+                btnUpload.setEnabled(false);
             }
         });
 
