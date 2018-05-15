@@ -1,112 +1,122 @@
 package com.sebdeveloper6952.uvg_file_sharing;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.OpenableColumns;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    private StorageReference mStorageRef;
-    // ACTIVITY FOR RESULT CODES
-    private final int RC_WRITE_IMG_CODE = 0;
-    private final int RC_CHOOSE_IMG = 1;
+public class HomeActivity extends AppCompatActivity
+{
+    // FIREBASE
+    private FirebaseDatabase database;
+    // OTHER
+    protected List<String> coursesList;
+    public static final String COURSE_NAME = "COURSE_NAME";
     // VIEWS
-    protected TextView txtNavHeaderUser;
+    protected ListView lViewCourses;
+    protected ArrayAdapter<String> lViewCoursesAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        // INITIALIZE LIST
+        coursesList = new ArrayList<>();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        // get storage reference
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        // GET REFERENCE TO VIEWS
+        prepareViews();
+        // Get Course Data from Firebase
+        getCourseData();
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_subir)
-        {
-
-        }
-        else if(id == R.id.nav_buscar)
-        {
-
-        }
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void preapreViews()
+    private void getCourseData()
     {
-        txtNavHeaderUser = findViewById(R.id.txtV_navHeaderUsername);
+        // Read from the database
+        ChildEventListener eventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                try
+                {
+                    // POPULATE LIST OF COURSES, SO IT UPDATES THE COURSES LIST VIEW
+                    coursesList.add((String)dataSnapshot.getKey());
+                    lViewCoursesAdapter.notifyDataSetChanged();
+                    Toast.makeText(HomeActivity.this,
+                            "onChildAdded: ", Toast.LENGTH_LONG).show();
+                }
+                catch(ClassCastException ex)
+                {
+                    Toast.makeText(HomeActivity.this, "onChildAdded ERROR",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Toast.makeText(HomeActivity.this,
+                        "onChildChanged: ", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Toast.makeText(HomeActivity.this,
+                        "onChildRemoved: ", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Toast.makeText(HomeActivity.this,
+                        "onChildMoved: ", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(HomeActivity.this,
+                        "onCancelled: ", Toast.LENGTH_LONG).show();
+            }
+        };
+
+        // database testing
+        database = FirebaseDatabase.getInstance();
+        // reference to /materias/
+        DatabaseReference matRef = database.getReference("materias");
+        matRef.addChildEventListener(eventListener);
+    }
+
+    private void prepareViews()
+    {
+        lViewCourses = findViewById(R.id.lView_HomeActivity_Courses);
+        // BIND ADAPTER TO COURSES LIST VIEW
+        lViewCoursesAdapter = new ArrayAdapter<>(HomeActivity.this,
+                android.R.layout.simple_list_item_1, coursesList);
+        lViewCourses.setAdapter(lViewCoursesAdapter);
+        lViewCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                // start activity CourseFileDetails with course id as intent extra
+                Intent intent = new Intent(HomeActivity.this, CourseFileDetails.class);
+                intent.putExtra(COURSE_NAME, coursesList.get(position));
+                intent.putExtra("position", position);
+                startActivity(intent);
+            }
+        });
     }
 }

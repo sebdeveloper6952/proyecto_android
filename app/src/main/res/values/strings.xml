@@ -22,4 +22,8 @@
     <string name="action_settings">Settings</string>
     <string name="home_menu_subir">Subir</string>
     <string name="home_menu_buscar">Buscar</string>
+    <string name="courses">Cursos</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
