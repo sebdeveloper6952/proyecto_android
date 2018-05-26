@@ -1,15 +1,21 @@
 package com.sebdeveloper6952.uvg_file_sharing;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -22,11 +28,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,12 +184,68 @@ public class CourseFileDetails extends AppCompatActivity {
         return result;
     }
 
+    private void downloadFile(String name) {
+        requestPermissions();
+        StorageReference ref = storage.child("materias/" + courseName + "/" + name);
+        lVFiles.setEnabled(false);
+        btnUpload.setEnabled(false);
+        try {
+            Toast.makeText(CourseFileDetails.this, "Descargando...",
+                    Toast.LENGTH_LONG).show();
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File tempFile = File.createTempFile(name, "jpg", dir);
+            ref.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(CourseFileDetails.this, "Archivo descargado.",
+                            Toast.LENGTH_LONG).show();
+                    lVFiles.setEnabled(true);
+                    btnUpload.setEnabled(true);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(CourseFileDetails.this, "Descarga fallida.",
+                            Toast.LENGTH_LONG).show();
+                    lVFiles.setEnabled(true);
+                    btnUpload.setEnabled(true);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(CourseFileDetails.this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(CourseFileDetails.this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(CourseFileDetails.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
+    }
+
     private void prepareViews()
     {
         lVFiles = findViewById(R.id.lViews_CourseFilesDetails_Details);
         lVFilesAdapter = new ArrayAdapter<>(CourseFileDetails.this,
                 android.R.layout.simple_list_item_1, filesList);
         lVFiles.setAdapter(lVFilesAdapter);
+
+        lVFiles.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                // download file
+                downloadFile(filesList.get(position));
+                return true;
+            }
+        });
         btnUpload = findViewById(R.id.btn_CourseFileDetails_Upload);
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
