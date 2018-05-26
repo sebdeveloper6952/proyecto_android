@@ -236,12 +236,14 @@ public class CourseFileDetails extends AppCompatActivity {
         lVFilesAdapter = new ArrayAdapter<>(CourseFileDetails.this,
                 android.R.layout.simple_list_item_1, filesList);
         lVFiles.setAdapter(lVFilesAdapter);
-        lVFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        lVFiles.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
                 // download file
                 downloadFile(filesList.get(position));
+                return true;
             }
         });
         btnUpload = findViewById(R.id.btn_CourseFileDetails_Upload);
