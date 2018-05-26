@@ -183,7 +183,14 @@ public class CourseFileDetails extends AppCompatActivity {
             Toast.makeText(CourseFileDetails.this, "Descargando...",
                     Toast.LENGTH_LONG).show();
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File tempFile = File.createTempFile(name, "jpg", dir);
+            String[] fileParts = name.split("\\.");
+            if(fileParts.length < 2)
+            {
+                Toast.makeText(CourseFileDetails.this, "Error en archivo.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            File tempFile = File.createTempFile(fileParts[0], ".jpg", dir);
             ref.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
