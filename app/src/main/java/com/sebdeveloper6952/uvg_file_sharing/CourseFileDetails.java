@@ -81,15 +81,11 @@ public class CourseFileDetails extends AppCompatActivity {
      * @param resultData
      */
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         // revisar requestCode y resultCode para determinar a que actividad se responde
-        if (requestCode == RC_CHOOSE_IMG)
-        {
-            if(resultCode == Activity.RESULT_OK)
-            {
-                if (resultData != null)
-                {
+        if (requestCode == RC_CHOOSE_IMG) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (resultData != null) {
                     selImgUri = resultData.getData();
                     Toast.makeText(getApplicationContext(), R.string.msg_img_selected_success,
                             Toast.LENGTH_SHORT).show();
@@ -98,9 +94,7 @@ public class CourseFileDetails extends AppCompatActivity {
                     // subir imagen seleccionada
                     uploadImage();
                 }
-            }
-            else
-            {
+            } else {
                 // TODO: (mostrar algun feedback) error en operacion de subir imagen
                 Toast.makeText(getApplicationContext(), R.string.msg_img_selected_failed,
                         Toast.LENGTH_SHORT).show();
@@ -110,9 +104,6 @@ public class CourseFileDetails extends AppCompatActivity {
         }
     }
 
-    /**
-     * Sube una imagen, por ahora la sube al folder img/
-     */
     private void uploadImage()
     {
         try
@@ -134,7 +125,6 @@ public class CourseFileDetails extends AppCompatActivity {
                         database.getReference("materias").child(courseName)
                                 .push().setValue(selImgName);
                         // resetear imagen seleccionada
-                        // TODO: ver si se mete en metodo
                         selImgUri = null;
                         selImgName = null;
                         btnUpload.setEnabled(true);

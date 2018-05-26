@@ -60,40 +60,30 @@ public class HomeActivity extends AppCompatActivity
                 try
                 {
                     // POPULATE LIST OF COURSES, SO IT UPDATES THE COURSES LIST VIEW
-                    coursesList.add((String)dataSnapshot.getKey());
+                    coursesList.add(dataSnapshot.getKey());
                     lViewCoursesAdapter.notifyDataSetChanged();
-                    Toast.makeText(HomeActivity.this,
-                            "onChildAdded: ", Toast.LENGTH_LONG).show();
                 }
                 catch(ClassCastException ex)
                 {
-                    Toast.makeText(HomeActivity.this, "onChildAdded ERROR",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivity.this,
+                            "Error descargando lista de cursos", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(HomeActivity.this,
-                        "onChildChanged: ", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Toast.makeText(HomeActivity.this,
-                        "onChildRemoved: ", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(HomeActivity.this,
-                        "onChildMoved: ", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(HomeActivity.this,
-                        "onCancelled: ", Toast.LENGTH_LONG).show();
             }
         };
 
